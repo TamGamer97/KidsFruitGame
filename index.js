@@ -71,6 +71,7 @@ async function Update()
     ctx.fill();
 
     AngryBird.view = 'front' // setting default view for charecter
+    var currentSpeed = AngryBirdSpeed
 
     for (f in fruitList)
     {
@@ -83,7 +84,9 @@ async function Update()
             {
                 if(AngryBird.x - fruitList[f].x >= 10) // if charecter is not within 10 pixels left of the fruit
                 {
-                    AngryBird.x -= AngryBirdSpeed // moving charecter by speed
+                    currentSpeed = (AngryBird.x - fruitList[f].x) / 50
+                    if(currentSpeed < 5) {currentSpeed = 5}
+                    AngryBird.x -= currentSpeed // moving charecter by speed
                     AngryBird.view = 'Left' // setting state of charecter
                 }else{
                     console.log('Eat ' + fruitList[f].fruit)
@@ -93,7 +96,9 @@ async function Update()
             }else{ // if fruit is towards the right of charecter
                 if(fruitList[f].x - AngryBird.x >= 10) // if charecter is not within 10 pixels right of the fruit
                 {
-                    AngryBird.x += AngryBirdSpeed // moving charecter by speed
+                    currentSpeed = (fruitList[f].x - AngryBird.x) / 50 
+                    if(currentSpeed < 5) {currentSpeed = 5}
+                    AngryBird.x += currentSpeed // moving charecter by speed
                     AngryBird.view = 'Right' // setting state of charecter
                 }else{
                     console.log('Eat ' + fruitList[f].fruit)
