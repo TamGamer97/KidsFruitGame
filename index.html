@@ -9,14 +9,58 @@
     <div style=" background: url(/Assets/Beach-Design/game_background_1/game_background_1.png); width: 100vw; height: 100vh; position: absolute; z-index: -1; top: 0px; left: 0px; object-fit: cover; background-size:100% 100%;">
     </div>
     <canvas id="canvas" style="z-index: 1;"></canvas>
+
+    <div id="player-container" style="width: 200px; height: 250px; position: absolute; bottom: 10px; margin-left: 0px;"></div>
 </body>
-<script src="https://unpkg.com/@esotericsoftware/spine-canvas@4.0.*/dist/iife/spine-canvas.js"></script>
-<script src="index.js"></script>
+
+
 </html>
+
+<script src="https://unpkg.com/@esotericsoftware/spine-player@4.1.*/dist/iife/spine-player.min.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/@esotericsoftware/spine-player@4.1.*/dist/spine-player.min.css">
 
 <script>
 
+
+
+    
+let playerSpine;
+function initAnim(anim)
+{
+    document.getElementById('player-container').innerHTML = ''
+
+    const jsonFile = '/Assets/Spine-Animation/actual/2D_Character_Rust.json'
+    const atlasFile = '/Assets/Spine-Animation/actual/2D_Character_Rust_3.8.99.atlas'
+
+    new spine.SpinePlayer("player-container", {
+        jsonUrl: "https://esotericsoftware.com/files/examples/4.1/spineboy/export/spineboy-pro.json",
+        atlasUrl: "https://esotericsoftware.com/files/examples/4.1/spineboy/export/spineboy-pma.atlas",
+    
+        animation: anim,
+        showControls: false,
+        alpha: true, // Enable player translucency
+        backgroundColor: '#00000000', // #00000000
+        success: function (player) {
+            // player.setAnimation("run", true);
+            // player.play()
+            playerSpine = player
+            // player.skeleton.scaleX = -1
+            console.log(player)
+        },
+    });
+}
+
+initAnim('walk')
+
+// setTimeout(() => { //only run that line after success function or else wont work
+//     playerSpine.setAnimation('run', true)
+//     playerSpine.skeleton.scaleX = -1
+//     playerSpine.currentViewport.x = 1000
+// }, 3000);
+
+
 </script>
+<script src="index.js"></script>
 
 <style>
     body{
@@ -24,5 +68,6 @@
         height: 100vh;
         width: 100vw;
         overflow: hidden;
+        background-color: gold;
     }
 </style>

@@ -4,8 +4,10 @@ canvas.width = window.innerWidth
 canvas.height = window.innerHeight
 
 var fruitList = []
-const AngryBirdSpeed = 5
 
+const walkingSpeed = 2
+const runningSpeed = 5
+const walkingDistance = 500
 
 class Fruit{
     constructor(fruit, x, y, isTouched)
@@ -46,7 +48,7 @@ class Character{
 }
 
 
-const AngryBird = new Character('AngryBird')
+// const AngryBird = new Character('AngryBird')
 
 
 function createFruit()
@@ -70,8 +72,10 @@ async function Update()
     ctx.fillStyle = 'rgba(255, 0,0,0.1)'
     ctx.fill();
 
-    AngryBird.view = 'front' // setting default view for charecter
-    var currentSpeed = AngryBirdSpeed
+    // AngryBird.view = 'front' // setting default view for charecter
+    var currentSpeed;
+
+    var playerCurrentPos = JSON.parse((document.getElementById('player-container').style.marginLeft).split('p')[0])
 
     for (f in fruitList)
     {
@@ -80,26 +84,53 @@ async function Update()
         if(fruitList[f].y > canvas.height - 200) // checking if fruit is on land (same y cords as player)
         {
             console.log('ready to be eaten')
-            if(AngryBird.x > fruitList[f].x) // if fruit is towards the left of charecter
+            if(playerCurrentPos > fruitList[f].x) // if fruit is towards the left of charecter
             {
-                if(AngryBird.x - fruitList[f].x >= 10) // if charecter is not within 10 pixels left of the fruit
+                if(playerCurrentPos - fruitList[f].x >= 10) // if charecter is not within 10 pixels left of the fruit
                 {
-                    currentSpeed = (AngryBird.x - fruitList[f].x) / 50
-                    if(currentSpeed < 5) {currentSpeed = 5}
-                    AngryBird.x -= currentSpeed // moving charecter by speed
-                    AngryBird.view = 'Left' // setting state of charecter
+                    distance = playerCurrentPos - fruitList[f].x
+                    if(distance < walkingDistance)
+                    {
+                        currentSpeed = walkingSpeed;
+                        playerSpine.addAnimation('walk', true)
+                    }
+                    else{
+                        currentSpeed = runningSpeed;
+                        if(playerSpine.animationState.tracks[0].animation.name != 'run')
+                        {
+                            playerSpine.setAnimation('run', true);
+                        }
+                        playerSpine.play()
+                    }
+                    document.getElementById('player-container').style.marginLeft = playerCurrentPos - currentSpeed + 'px' // moving charecter by speed
+                    // AngryBird.view = 'Left' // setting state of charecter
+                    playerSpine.skeleton.scaleX = -1 // face left
                 }else{
                     console.log('Eat ' + fruitList[f].fruit)
                     fruitList.pop(f) // removing fruit
                     createFruit() // initilising a new random fruit
                 }
             }else{ // if fruit is towards the right of charecter
-                if(fruitList[f].x - AngryBird.x >= 10) // if charecter is not within 10 pixels right of the fruit
+                if(fruitList[f].x - playerCurrentPos >= 80) // if charecter is not within 10 pixels right of the fruit
                 {
-                    currentSpeed = (fruitList[f].x - AngryBird.x) / 50 
-                    if(currentSpeed < 5) {currentSpeed = 5}
-                    AngryBird.x += currentSpeed // moving charecter by speed
-                    AngryBird.view = 'Right' // setting state of charecter
+                    distance = fruitList[f].x - playerCurrentPos
+                    if(distance < walkingDistance)
+                    {
+                        currentSpeed = walkingSpeed;
+                        playerSpine.addAnimation('walk', true)
+                    }
+                    else{
+                        currentSpeed = runningSpeed;
+                        if(playerSpine.animationState.tracks[0].animation.name != 'run')
+                        {
+                            playerSpine.setAnimation('run', true);
+                        }
+                        playerSpine.play()
+                    }
+                    // AngryBird.x += currentSpeed // moving charecter by speed
+                    document.getElementById('player-container').style.marginLeft = playerCurrentPos + currentSpeed + 'px' // moving charecter by speed
+                    // AngryBird.view = 'Right' // setting state of charecter
+                    playerSpine.skeleton.scaleX = 1 // face right
                 }else{
                     console.log('Eat ' + fruitList[f].fruit)
                     fruitList.pop(f) // removing fruit
@@ -107,10 +138,18 @@ async function Update()
                 }
             }
 
+        }else{
+            if(playerSpine)
+            {
+                if(playerSpine.animationState.tracks[0].animation.name != 'idle')
+                {
+                    playerSpine.setAnimation('idle', true);
+                }
+            }
         }
     }
 
-    AngryBird.spawn() // placing the charecter after adjusstments (movement, state)
+    // AngryBird.spawn() // placing the charecter after adjusstments (movement, state)
 
     requestAnimationFrame(Update)
 }
