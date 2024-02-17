@@ -4,6 +4,7 @@ canvas.width = window.innerWidth
 canvas.height = window.innerHeight
 
 var fruitList = []
+var isEatenFinished = true
 
 const walkingSpeed = 2
 const runningSpeed = 5
@@ -61,6 +62,16 @@ function createFruit()
     fruitList.push(fruit)
 }
 
+function eatFruit()
+{
+    const eatingAnimLength = 700
+    setTimeout(() => {
+        isEatenFinished = true
+        createFruit()
+    }, eatingAnimLength);
+
+}
+
 async function Update()
 {
     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height); // clear canvas
@@ -107,8 +118,10 @@ async function Update()
                     playerSpine.skeleton.scaleX = -1 // face left
                 }else{
                     console.log('Eat ' + fruitList[f].fruit)
+                    isEatenFinished = false
+                    playerSpine.addAnimation('jump', true)
                     fruitList.pop(f) // removing fruit
-                    createFruit() // initilising a new random fruit
+                    eatFruit() // initilising a new random fruit
                 }
             }else{ // if fruit is towards the right of charecter
                 if(fruitList[f].x - playerCurrentPos >= 80) // if charecter is not within 10 pixels right of the fruit
@@ -133,15 +146,17 @@ async function Update()
                     playerSpine.skeleton.scaleX = 1 // face right
                 }else{
                     console.log('Eat ' + fruitList[f].fruit)
+                    isEatenFinished = false
+                    playerSpine.setAnimation('jump', true)
                     fruitList.pop(f) // removing fruit
-                    createFruit() // initilising a new random fruit
+                    eatFruit() // initilising a new random fruit
                 }
             }
 
         }else{
             if(playerSpine)
             {
-                if(playerSpine.animationState.tracks[0].animation.name != 'idle')
+                if(playerSpine.animationState.tracks[0].animation.name != 'idle' && isEatenFinished)
                 {
                     playerSpine.setAnimation('idle', true);
                 }
