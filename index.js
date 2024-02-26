@@ -9,6 +9,7 @@ var isEatenFinished = true
 const walkingSpeed = 2
 const runningSpeed = 5
 const walkingDistance = 500
+const slowingDownSpeed = 0.08
 
 class Fruit{
     constructor(fruit, x, y, isTouched)
@@ -72,6 +73,7 @@ function eatFruit()
 
 }
 
+var currentSpeed;
 async function Update()
 {
     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height); // clear canvas
@@ -84,10 +86,10 @@ async function Update()
     ctx.fill();
 
     // AngryBird.view = 'front' // setting default view for charecter
-    var currentSpeed;
 
     var playerCurrentPos = JSON.parse((document.getElementById('player-container').style.marginLeft).split('p')[0])
 
+    // console.log(currentSpeed)
     for (f in fruitList)
     {
         fruitList[f].spawn() // initialy spawing fruit
@@ -102,7 +104,13 @@ async function Update()
                     distance = playerCurrentPos - fruitList[f].x
                     if(distance < walkingDistance)
                     {
-                        currentSpeed = walkingSpeed;
+                        if(currentSpeed > walkingSpeed)
+                        {
+                            currentSpeed = currentSpeed - slowingDownSpeed
+                        }else if(currentSpeed <= walkingSpeed)
+                        {
+                            currentSpeed = walkingSpeed;
+                        }
                         playerSpine.addAnimation('walk', true)
                     }
                     else{
@@ -119,7 +127,7 @@ async function Update()
                 }else{
                     console.log('Eat ' + fruitList[f].fruit)
                     isEatenFinished = false
-                    playerSpine.addAnimation('jump', true)
+                    playerSpine.setAnimation('death', true)
                     fruitList.pop(f) // removing fruit
                     eatFruit() // initilising a new random fruit
                 }
@@ -129,7 +137,13 @@ async function Update()
                     distance = fruitList[f].x - playerCurrentPos
                     if(distance < walkingDistance)
                     {
-                        currentSpeed = walkingSpeed;
+                        if(currentSpeed > walkingSpeed)
+                        {
+                            currentSpeed = currentSpeed - slowingDownSpeed
+                        }else if(currentSpeed <= walkingSpeed)
+                        {
+                            currentSpeed = walkingSpeed;
+                        }
                         playerSpine.addAnimation('walk', true)
                     }
                     else{
@@ -147,7 +161,7 @@ async function Update()
                 }else{
                     console.log('Eat ' + fruitList[f].fruit)
                     isEatenFinished = false
-                    playerSpine.setAnimation('jump', true)
+                    playerSpine.setAnimation('death', true)
                     fruitList.pop(f) // removing fruit
                     eatFruit() // initilising a new random fruit
                 }
@@ -159,6 +173,7 @@ async function Update()
                 if(playerSpine.animationState.tracks[0].animation.name != 'idle' && isEatenFinished)
                 {
                     playerSpine.setAnimation('idle', true);
+                    currentSpeed = 0
                 }
             }
         }
@@ -222,6 +237,30 @@ function events()
             }
         }
 
+    })
+
+    document.addEventListener('keypress', (event) => {
+        if(event.code == 'Space' && isEatenFinished && currentSpeed == 0)
+        {
+            // make player jump on clicking space
+            console.log('jump')
+            isEatenFinished = false
+            playerSpine.setAnimation('jump', true)
+
+            // console.log(playerSpine.skeleton)
+
+            // playerSpine.skeleton.scaleY = -1 // scale up a bit to match normal size when jumping
+
+            // document.getElementById('player-container').style.width = '400px'
+            document.getElementById('player-container').style.height = '450px'
+
+            const jumpingAnimLength = 1050
+            setTimeout(() => {
+                isEatenFinished = true
+                // document.getElementById('player-container').style.width = '200px'
+                document.getElementById('player-container').style.height = '250px'
+            }, jumpingAnimLength);
+        }
     })
 }
 
